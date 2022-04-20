@@ -21,9 +21,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: dekinderfiets/pr-description-enforcer@v1
+            - uses: rudderlabs/pr-description-enforcer@v1.0.0
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
+                  placeholder-regex: '< Replace .* >'
 
 ```
 

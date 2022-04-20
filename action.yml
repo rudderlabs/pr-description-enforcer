@@ -1,13 +1,9 @@
 name: 'Pull Request Description Enforcement'
 description: 'github action for enforcing description on pull requests'
-branding:
-  icon: 'book-open'  
-  color: 'yellow'
 inputs: 
   repo-token:
     description: 'The GITHUB_TOKEN secret'
     required: true
-    
 runs:
   using: 'node12'
   main: 'dist/index.js'

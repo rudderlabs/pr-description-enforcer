@@ -2,10 +2,10 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 const PR_TEMPLATE_PATHS = [
+  '.github/pull_request_template.md',
+  '.github/PULL_REQUEST_TEMPLATE.md',
   'PULL_REQUEST_TEMPLATE.md',
   'pull_request_template.md',
-  '.github/PULL_REQUEST_TEMPLATE.md',
-  '.github/pull_request_template.md',
   'docs/PULL_REQUEST_TEMPLATE.md',
   'docs/pull_request_template.md',
   'PULL_REQUEST_TEMPLATE.txt',
@@ -74,6 +74,7 @@ const getPrTemplate = async (client, paths) => {
 async function run() {
   try {
     const token = core.getInput("repo-token", { required: true });
+    const placeholderRegex = new RegExp(core.getInput("placeholder-regex", {required: false}) || "< Replace .* >");
 
     const client = github.getOctokit(token)
 
@@ -81,10 +82,18 @@ async function run() {
     const prTemplate = await getPrTemplate(client, PR_TEMPLATE_PATHS)
 
     if (!prDescription) {
-      core.setFailed("PR description missing");
-    } else if (prDescription.includes(prTemplate)) {
-      core.setFailed("PR description includes PR template text verbatim. Please adjust the default PR text to include a more complete description");
+      core.setFailed("Pull request description is missing");
+      return
     }
+    if (prDescription.includes(prTemplate)) {
+      core.setFailed("Pull request description is the same with the template's text verbatim. Please adjust the default text to include a more complete description");
+      return
+    }
+    if (prDescription.match(placeholderRegex)) {
+      core.setFailed("Pull request template placeholders found. Please replace the placeholders with the appropriate text");
+      return
+    }
+
   } catch (error) {
     core.setFailed(error.message);
   }
